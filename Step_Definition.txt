@@ -1,0 +1,59 @@
+System.setProperty("webdriver.chrome.driver","c:/driver/path/");
+WebDriver driver = new ChromeDriver();
+ArrayList<String> rates = new ArrayList<String>();
+ArrayList<String> timetaken = new ArrayList<String>();
+
+@Given("^User is on the home page of the Make My trip$")
+public void login()
+{
+driver.get("https://www.makemytrip.com/flights/");
+//User wait to see the site 
+driver.manage().timeouts().implicitlywait(30,TimeUnit.SECONDS);
+}
+ 
+@When("^User enter the \"([^\"]*)\" and \"([^\"]*)\" and click on Search button$")
+public void enterItinerary(String from, String to)
+{
+driver.findelement(By.id("fromCity")).sendkeys("from");
+driver.findelement(By.id("toCity")).sendkeys("to");
+driver.findelement(By.xpath("//a[contains(text(),'Search')]")).click();
+driver.manage().timeouts().implicitlywait(30,TimeUnit.SECONDS);
+}
+
+@And("^User extract the fares and time taken for the itinerary$")
+//Extracted all rates and stored in rates arraylist
+public void extractFaresandTimeTaken()
+{
+List<WebElement> ele=driver.findelements(By.xpath("//div[@class='dept-options-section clearfix']/div/p/span"));
+
+for(int i=0;i<=ele.size();i++)
+{
+String rateextract=ele.get(i).getText();
+rates.add(rateextract);
+}
+
+List<WebElement> ele1=driver.findelements(By.xpath("//div[@class='dept-options-section clearfix']/div/p/span/../.."));
+for(int j=0;j<=ele1.size();i++)
+{
+String time=ele1.get(j).getText();
+timetaken.add(time);
+}
+}
+
+@Then("^User Selects the best itinerary based on the fastest and cheapest travel$")
+//find the minimum time taken by the flight which is stored in timetaken arraylist and pass it as argument in the xpath
+public void bestItinerary()
+{
+String minTime=Collections.min(timetaken);
+driver.findelement(By.xpath("//div[@class='dept-options-section clearfix']/div/p/span/../../contains[text(),'+minTime+']")).click();
+driver.findelement().findelement(By.id("Book Now")).click();
+}
+
+@And("^User select the fastest evening flight in case of multiple options$")
+public find the fasestEveningFlight()
+{
+driver.findelement(By.xpath("//p[contains(text(),'After')][1]")).click();
+driver.findelement(By.xpath("//div[@class='dept-options-section clearfix']/div/p/span")).click();
+driver.findelement().findelement(By.id("Book Now")).click();
+
+}
